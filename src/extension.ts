@@ -12,9 +12,9 @@ function isCocosProject() {
   }
   const rootPath = vscode.workspace.workspaceFolders[0];
   if (!rootPath) { return false; }
-  const projectJsonPath = path.join(rootPath, "project.json");
+  const projectJsonPath = path.join(rootPath.uri, "project.json");
   if (fs.existsSync(projectJsonPath)) { return true; }
-  const packageJsonPath = path.join(rootPath, "package.json");
+  const packageJsonPath = path.join(rootPath.uri, "package.json");
   if (!fs.existsSync(packageJsonPath)) { return false; }
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath));
   return packageJson.creator;
