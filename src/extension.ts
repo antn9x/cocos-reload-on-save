@@ -5,7 +5,7 @@ const http = require("http");
 const path = require("path");
 const fs = require("fs");
 
-function isCocosProject() {
+function checkCocosProject() {
   if (!vscode.workspace.workspaceFolders) {
     vscode.window.showInformationMessage('No folder or workspace opened');
     return false;
@@ -14,17 +14,18 @@ function isCocosProject() {
   // console.log('not rootPath', rootPath, rootPath.uri.fsPath);
   if (!rootPath) { return false; }
   const projectJsonPath = path.join(rootPath.uri.fsPath, "project.json");
-  if (fs.existsSync(projectJsonPath)) { return true; }
+  if (fs.existsSync(projectJsonPath)) { return 2; }
   const packageJsonPath = path.join(rootPath.uri.fsPath, "package.json");
   if (!fs.existsSync(packageJsonPath)) { return false; }
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath));
-  return packageJson.creator;
+  return packageJson.creator ? 3 : 0;
 }
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  if (!isCocosProject()) {
+  const version = checkCocosProject();
+  if (!version) {
     console.log('not isCocosProject');
     return;
   }
@@ -33,7 +34,13 @@ export function activate(context: vscode.ExtensionContext) {
     if (timeout && timeout.hasRef()) { clearTimeout(timeout); }
     const host = vscode.workspace.getConfiguration().get("cocos.host");
     // console.log('on changed', host);
-    timeout = setTimeout(() => http.get(`${host}/update-db/refresh`).on("error", (err: Error) => console.log(err.message)), 200);
+    timeout = setTimeout(() => {
+      if (version === 3) {
+        http.get(`${host}/asset-db/refresh`);
+      } else if (version === 2) {
+        http.get(`${host}/update-db`);
+      }
+    }, 200);
   });
 }
 
