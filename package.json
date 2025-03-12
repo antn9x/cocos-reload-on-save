@@ -4,7 +4,7 @@
   "description": "reload browser when save code for cocos creaator ",
   "publisher": "antn9x",
   "repository": "https://github.com/antn9x/cocos-reload-on-save",
-  "version": "0.0.3",
+  "version": "1.0.1",
   "engines": {
     "vscode": "^1.73.0"
   },
@@ -20,7 +20,7 @@
       "type": "object",
       "title": "cocos-reload-on-save",
       "properties": {
-        "host.host": {
+        "cocos.host": {
           "type": "string",
           "default": "http://127.0.0.1:7456",
           "description": "url"

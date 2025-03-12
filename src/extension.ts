@@ -7,14 +7,15 @@ const fs = require("fs");
 
 function isCocosProject() {
   if (!vscode.workspace.workspaceFolders) {
-    // vscode.window.showInformationMessage('No folder or workspace opened');
+    vscode.window.showInformationMessage('No folder or workspace opened');
     return false;
   }
   const rootPath = vscode.workspace.workspaceFolders[0];
+  // console.log('not rootPath', rootPath, rootPath.uri.fsPath);
   if (!rootPath) { return false; }
-  const projectJsonPath = path.join(rootPath.uri.path, "project.json");
+  const projectJsonPath = path.join(rootPath.uri.fsPath, "project.json");
   if (fs.existsSync(projectJsonPath)) { return true; }
-  const packageJsonPath = path.join(rootPath.uri.path, "package.json");
+  const packageJsonPath = path.join(rootPath.uri.fsPath, "package.json");
   if (!fs.existsSync(packageJsonPath)) { return false; }
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath));
   return packageJson.creator;
@@ -23,13 +24,16 @@ function isCocosProject() {
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
-  const host = vscode.workspace.getConfiguration().get("host.host");
-  if (!isCocosProject()) { return; }
+  if (!isCocosProject()) {
+    console.log('not isCocosProject');
+    return;
+  }
   let timeout: NodeJS.Timeout;
   vscode.workspace.onDidSaveTextDocument((e) => {
     if (timeout && timeout.hasRef()) { clearTimeout(timeout); }
-    timeout = setTimeout(() => http.get(`${host}/update-db`).on("error", (err: Error) => console.log(err.message)), 200);
+    const host = vscode.workspace.getConfiguration().get("cocos.host");
+    // console.log('on changed', host);
+    timeout = setTimeout(() => http.get(`${host}/update-db/refresh`).on("error", (err: Error) => console.log(err.message)), 200);
   });
 }
 
