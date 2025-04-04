@@ -1,7 +1,7 @@
 {
   "name": "cocos-reload-on-save",
   "displayName": "cocos-reload-on-save",
-  "description": "reload browser when save code for cocos creaator ",
+  "description": "reload browser when save code for cocos creator 2 & 3",
   "publisher": "antn9x",
   "repository": "https://github.com/antn9x/cocos-reload-on-save",
   "version": "1.0.2",
